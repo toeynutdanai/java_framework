@@ -1,6 +1,7 @@
 package com.example.demoapp.employees;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 
@@ -52,6 +53,21 @@ public class EmployeeServiceUnitTest {
 				fail("Message fail with=" + e.getMessage());
 			}
 		}
+	}
+	
+	@Test
+	public void employee_not_found_with_junit5() {
+		// Arrange
+		int id = 1;
+
+		when(employeeRepository.findById(id)).thenReturn(Optional.empty());
+		// Act
+		// Constructor Injection
+		EmployeeService employeeService = new EmployeeService(employeeRepository);
+		Exception exception = assertThrows(EmployeeNotFoundException.class, () -> 
+			employeeService.getById(id)
+		);
+		assertEquals("Employee not found id=1", exception.getMessage());
 	}
 
 }
