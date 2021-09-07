@@ -2,7 +2,7 @@ package com.example.demoapp.employees;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,7 +12,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import com.example.demoapp.employees.EmployeeResponse;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-class EmployeeControllerTests {
+class EmployeeControllerFailureTests {
 
 	@Autowired 
 	private TestRestTemplate restTemplate;
@@ -20,36 +20,18 @@ class EmployeeControllerTests {
 	@Autowired
 	private EmployeeRepository employeeRepository;
 	
-	@AfterEach
-	public void deleteDataForTest() {
-		employeeRepository.deleteAll();
-	}
-	
 	@Test
-	public void getEmployeeById() {
+	@DisplayName("เกิด error 404 เมื่อค้นหา employee id = 1 ไม่เจอ")
+	public void case01() {
 		// Arrange
 		int id = 1;
-		Employee employee100 = new Employee();
-		employee100.setName("natdanai");
-		employeeRepository.save(employee100);
-		
 		// Action
-		EmployeeResponse result 
-			= restTemplate.getForObject("/employees/" + id, EmployeeResponse.class);
+		ErrorResponse result 
+			= restTemplate.getForObject("/employees/" + id, ErrorResponse.class);
 	
 		//Assert
-		assertEquals(id, result.getId());
-		assertEquals("natdanai", result.getName());
-	}
-	
-	@Test
-	public void listEmployee() {
-		// Action
-		EmployeeResponse[] results 
-			= restTemplate.getForObject("/employees", EmployeeResponse[].class);
-	
-		//Assert
-		assertEquals(2, results.length);
+		assertEquals(404, result.getCode());
+		assertEquals("Employee not found id=1", result.getDetail());
 	}
 
 }
